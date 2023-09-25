@@ -84,9 +84,22 @@ class University extends Model
     }
 
     /*
+     * Return a boolean indicating if the current User has marked this University as favourite.
+     * Returns false if there is no User logged in.
+     */
+    public function isUserFavourite(): bool
+    {
+        $user = Auth::guard('sanctum')->user();
+        if(!$user) {
+            return false;
+        }
+        return $user->getFavouriteUniversities()->contains($this);
+    }
+
+    /*
      * Return a count of the number of reviews submitted/stored for this University.
      */
-    public function getReviewsCount(): int 
+    private function getReviewsCount(): int 
     {
         return $this->reviews()->count();
     }
@@ -94,7 +107,7 @@ class University extends Model
     /*
      * Return a Collection of all of the reviews for this University.
      */
-    public function getReviews(): Collection 
+    private function getReviews(): Collection 
     {
         return $this->reviews()
                     ->select('id','user_name','review_comment',
@@ -106,22 +119,9 @@ class University extends Model
      * Return a float value, the average rating (1-5) for this University across all its reviews.
      * Will return null if there are 0 reviews.
      */
-    public function getAverageRating(): float|null 
+    private function getAverageRating(): float|null 
     {
         return $this->reviews()->average('rating');
-    }
-
-    /*
-     * Return a boolean indicating if the current User has marked this University as favourite.
-     * Returns false if there is no User logged in.
-     */
-    public function isUserFavourite(): bool
-    {
-        $user = Auth::guard('sanctum')->user();
-        if(!$user) {
-            return false;
-        }
-        return $user->getFavouriteUniversities()->contains($this);
     }
 
 
